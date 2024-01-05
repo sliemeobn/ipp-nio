@@ -11,6 +11,7 @@ let package = Package(
     ],
     products: [
         .library(name: "IppProtocol", targets: ["IppProtocol"]),
+        .library(name: "IppClient", targets: ["IppClient"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.62.0"),
@@ -35,10 +36,11 @@ let package = Package(
             ]
         ),
         .executableTarget(
-            name: "Examples",
+            name: "PrintPDF",
             dependencies: [
                 .target(name: "IppClient"),
-            ]
+            ],
+            path: "Examples/PrintPDF"
         ),
         .testTarget(
             name: "IppTests",

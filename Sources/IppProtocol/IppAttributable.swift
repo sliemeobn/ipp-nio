@@ -30,7 +30,7 @@ public extension IppAttributable {
     }
 }
 
-public extension IppAttributable {
+public extension IppRequest {
     /// Access an attribute in the `operation` group.
     subscript<V>(operation attribute: KeyPath<SemanticModel.Attributes.Operation, SemanticModel.Attribute<V>>) -> V? {
         get {
@@ -42,12 +42,34 @@ public extension IppAttributable {
     }
 
     /// Access an attribute in the `job` group.
-    subscript<V>(jobTemplate attribute: KeyPath<SemanticModel.Attributes.JobTemplate, SemanticModel.Attribute<V>>) -> V? {
+    subscript<V>(job attribute: KeyPath<SemanticModel.Attributes.JobTemplate, SemanticModel.Attribute<V>>) -> V? {
         get {
             self[.job][(\SemanticModel.Attributes.jobTemplate).appending(path: attribute)]
         }
         set {
             self[.job][(\SemanticModel.Attributes.jobTemplate).appending(path: attribute)] = newValue
+        }
+    }
+}
+
+public extension IppResponse {
+    /// Access an attribute in the `operation` group.
+    subscript<V>(operation attribute: KeyPath<SemanticModel.Attributes.OperationResponse, SemanticModel.Attribute<V>>) -> V? {
+        get {
+            self[.operation][(\SemanticModel.Attributes.operationResponse).appending(path: attribute)]
+        }
+        set {
+            self[.operation][(\SemanticModel.Attributes.operationResponse).appending(path: attribute)] = newValue
+        }
+    }
+
+    /// Access an attribute in the `job` group.
+    subscript<V>(job attribute: KeyPath<SemanticModel.Attributes.JobDescription, SemanticModel.Attribute<V>>) -> V? {
+        get {
+            self[.job][(\SemanticModel.Attributes.jobDescription).appending(path: attribute)]
+        }
+        set {
+            self[.job][(\SemanticModel.Attributes.jobDescription).appending(path: attribute)] = newValue
         }
     }
 }

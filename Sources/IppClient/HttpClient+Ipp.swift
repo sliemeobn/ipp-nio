@@ -43,7 +43,7 @@ public extension HTTPClientRequest {
     }
 }
 
-/// Represents the error when an IPP request fails with a HTTP response that is not 200 OK.
+/// Represents the error when an IPP request fails with an HTTP response that is not 200 OK.
 public struct IppHttpResponseError: Error, CustomStringConvertible {
     public let response: HTTPClientResponse
 

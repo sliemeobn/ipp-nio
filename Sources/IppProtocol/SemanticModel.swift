@@ -25,6 +25,7 @@ public enum SemanticModel {
     /// Provides key-paths for simplified typed access to attributes on IPP requests and responses.
     public struct Attributes {
         public let operation = Operation()
+        public let operationResponse = OperationResponse()
         public let jobTemplate = JobTemplate()
         public let jobDescription = JobDescription()
 
@@ -33,6 +34,7 @@ public enum SemanticModel {
             public var attributesNaturalLanguage: Attribute<String> { .init(name: .attributesNaturalLanguage, syntax: Syntaxes.naturalLanguage) }
             public var printerUri: Attribute<String> { .init(name: .printerUri, syntax: Syntaxes.uri) }
             public var jobUri: Attribute<String> { .init(name: .jobUri, syntax: Syntaxes.uri) }
+            public var jobId: Attribute<Int32> { .init(name: .jobId, syntax: Syntaxes.integer) }
             public var documentUri: Attribute<String> { .init(name: .documentUri, syntax: Syntaxes.uri) }
             public var requestingUserName: Attribute<String> { .init(name: .requestingUserName, syntax: Syntaxes.name) }
             public var jobName: Attribute<String> { .init(name: .jobName, syntax: Syntaxes.name) }
@@ -40,7 +42,11 @@ public enum SemanticModel {
             public var requestedAttributes: Attribute<[IppAttribute.Name]> { .init(name: .requestedAttributes, syntax: Syntaxes.setOfKeywords()) }
             public var documentFormat: Attribute<String> { .init(name: .documentFormat, syntax: Syntaxes.mimeMediaType) }
             public var ippAttributeFidelity: Attribute<Bool> { .init(name: .ippAttributeFidelity, syntax: Syntaxes.boolean) }
+        }
 
+        public struct OperationResponse {
+            public var attributesCharset: Attribute<String> { .init(name: .attributesCharset, syntax: Syntaxes.charset) }
+            public var attributesNaturalLanguage: Attribute<String> { .init(name: .attributesNaturalLanguage, syntax: Syntaxes.naturalLanguage) }
             public var statusMessage: Attribute<String> { .init(name: .statusMessage, syntax: Syntaxes.text) }
             public var detailedStatusMessage: Attribute<String> { .init(name: .detailedStatusMessage, syntax: Syntaxes.text) }
         }
@@ -53,6 +59,7 @@ public enum SemanticModel {
         }
 
         public struct JobDescription {
+            public var jobUri: Attribute<String> { .init(name: .jobUri, syntax: Syntaxes.uri) }
             public var jobId: Attribute<Int32> { .init(name: .jobId, syntax: Syntaxes.integer) }
             public var jobState: Attribute<JobState> { .init(name: .jobState, syntax: Syntaxes.enum()) }
         }

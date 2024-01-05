@@ -1,6 +1,7 @@
 import AsyncHTTPClient
 import IppProtocol
 
+/// Implements the ``IppPrinterObject`` using a HTTPClient.
 public struct IppPrinter: IppPrinterObject, Sendable {
     public var httpClient: HTTPClient
     public var uri: String

@@ -5,7 +5,12 @@ import struct Foundation.URLComponents // NOTE: the only use of Foundation... wo
 /// This is to decouple the specific HTTP transport from the semantic mode.
 public protocol IppObjectProtocol {
     associatedtype DataFormat
+    /// Creates a new IPP request with the given operation ID that is targeted at this object.
+    /// 
+    /// The request will be initialized with the IPP version, operation ID, the the required attributes for its target.
     func makeNewRequest(operation: IppOperationId) -> IppRequest
+
+    /// Executes the given request and returns the response.
     func execute(request: IppRequest, data: DataFormat?) async throws -> IppResponse
 }
 
@@ -52,6 +57,19 @@ public extension IppPrinterObject {
         }
 
         return try await execute(request: request, data: data)
+    }
+}
+
+public extension IppJobObject {
+    /// Executes a Get-Job-Attributes request.
+    func getJobAttributes(
+        requestedAttributes: [IppAttribute.Name]? = nil
+    ) async throws -> IppResponse {
+        var request = makeNewRequest(operation: .getJobAttributes)
+
+        request[operation: \.requestedAttributes] = requestedAttributes
+
+        return try await execute(request: request, data: nil)
     }
 }
 
