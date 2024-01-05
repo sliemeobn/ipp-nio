@@ -19,7 +19,7 @@ public struct IppPrinter: IppPrinterObject, Sendable {
         //TODO: add user/auth here
     }
 
-    public func execute(request: IppProtocol.IppRequest, data: HTTPClientRequest.Body?) async throws -> IppResponse {
+    public func execute(request: IppRequest, data: HTTPClientRequest.Body?) async throws -> IppResponse {
         try await httpClient.execute(request, data: data)
     }
 }

@@ -25,9 +25,7 @@ public extension HTTPClient {
 public extension HTTPClientRequest {
     /// Creates a HTTP by encoding the IPP request and attaching the data if provided.
     init(ippRequest: IppRequest, data: consuming Body? = nil) throws {
-        let uri = try ippRequest.getTargetUriIfValidOrThrow()
-
-        self.init(url: uri)
+        self.init(url: try ippRequest.validatedHttpTargetUrl)
         method = .POST
         headers.add(name: "content-type", value: "application/ipp")
         // TODO: auth

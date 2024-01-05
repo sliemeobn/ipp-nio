@@ -40,4 +40,14 @@ public extension IppAttributable {
             self[.operation][(\SemanticModel.Attributes.operation).appending(path: attribute)] = newValue
         }
     }
+
+    /// Access an attribute in the `job` group.
+    subscript<V>(jobTemplate attribute: KeyPath<SemanticModel.Attributes.JobTemplate, SemanticModel.Attribute<V>>) -> V? {
+        get {
+            self[.job][(\SemanticModel.Attributes.jobTemplate).appending(path: attribute)]
+        }
+        set {
+            self[.job][(\SemanticModel.Attributes.jobTemplate).appending(path: attribute)] = newValue
+        }
+    }
 }

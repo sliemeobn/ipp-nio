@@ -11,7 +11,9 @@ public protocol IppObjectProtocol {
 
 /// Defines a simplified API for the most common operations of IPP printers.
 public protocol IppPrinterObject: IppObjectProtocol {}
-// could be extended to support other IPP objects like jobs, etc. with their own API
+
+/// Defines a simplified API for the most common operations of IPP jobs.
+public protocol IppJobObject: IppObjectProtocol {}
 
 public extension IppPrinterObject {
     /// Executes a Get-Printer-Attributes request.
@@ -26,11 +28,10 @@ public extension IppPrinterObject {
             $0[\.operation.documentFormat] = documentFormat
         }
 
-        print(request)
-
         return try await execute(request: request, data: nil)
     }
 
+    /// Executes a Print-Job request.
     func printJob(
         jobName: String? = nil,
         documentName: String? = nil,
@@ -50,8 +51,6 @@ public extension IppPrinterObject {
             request[.job] = jobAttributes
         }
 
-        print(request)
-
         return try await execute(request: request, data: data)
     }
 }
@@ -68,37 +67,43 @@ public extension IppRequest {
         }
     }
 
-    package func getTargetUriIfValidOrThrow() throws -> String {
-        guard let firstGroup = attributeGroups.first,
-              firstGroup.name == .operation,
-              firstGroup.attributes.count >= 3
-        else {
-            throw InvalidRequestError.invalidOperationAttributes
-        }
+    /// Returns the target URL for this request or throws if the request is invalid.
+    ///
+    /// Accessing this propery will throw if the request does not contain the required attributes for sending
+    /// according to the IPP specification.
+    var validatedHttpTargetUrl: String {
+        get throws {
+            guard let firstGroup = attributeGroups.first,
+                  firstGroup.name == .operation,
+                  firstGroup.attributes.count >= 3
+            else {
+                throw InvalidRequestError.invalidOperationAttributes
+            }
 
-        guard firstGroup.attributes.keys[0] == .attributesCharset,
-              firstGroup.attributes.keys[1] == .attributesNaturalLanguage,
-              firstGroup.attributes.keys[2] == .printerUri || firstGroup.attributes.keys[2] == .jobUri,
-              case let .uri(uri) = firstGroup.attributes.values[2].value
-        else {
-            throw InvalidRequestError.invalidOperationAttributes
-        }
+            guard firstGroup.attributes.keys[0] == .attributesCharset,
+                  firstGroup.attributes.keys[1] == .attributesNaturalLanguage,
+                  firstGroup.attributes.keys[2] == .printerUri || firstGroup.attributes.keys[2] == .jobUri,
+                  case let .uri(uri) = firstGroup.attributes.values[2].value
+            else {
+                throw InvalidRequestError.invalidOperationAttributes
+            }
 
-        guard var targetURL = URLComponents(string: uri) else {
-            throw InvalidRequestError.invalidTargetUri(uri)
-        }
+            guard var targetURL = URLComponents(string: uri) else {
+                throw InvalidRequestError.invalidTargetUri(uri)
+            }
 
-        switch targetURL.scheme {
-        case "ipp":
-            targetURL.scheme = "http"
-        case "ipps":
-            targetURL.scheme = "https"
-        default:
-            throw InvalidRequestError.invalidScheme(targetURL.scheme ?? "<none>")
-        }
+            switch targetURL.scheme {
+            case "ipp":
+                targetURL.scheme = "http"
+            case "ipps":
+                targetURL.scheme = "https"
+            default:
+                throw InvalidRequestError.invalidScheme(targetURL.scheme ?? "<none>")
+            }
 
-        targetURL.port = targetURL.port ?? 631
-        return targetURL.string!
+            targetURL.port = targetURL.port ?? 631
+            return targetURL.string!
+        }
     }
 }
 

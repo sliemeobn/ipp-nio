@@ -7,18 +7,38 @@ public extension IppAttribute.Name {
     static var documentUri: Self { .init(rawValue: "document-uri") }
     static var requestingUserName: Self { .init(rawValue: "requesting-user-name") }
     static var jobName: Self { .init(rawValue: "job-name") }
+    static var jobId: Self { .init(rawValue: "job-id") }
     static var documentName: Self { .init(rawValue: "document-name") }
     static var documentFormat: Self { .init(rawValue: "document-format") }
     static var requestedAttributes: Self { .init(rawValue: "requested-attributes") }
     static var ippAttributeFidelity: Self { .init(rawValue: "ipp-attribute-fidelity") }
     static var compression: Self { .init(rawValue: "compression") }
 
+    // job template attributes
     static var jobPriority: Self { .init(rawValue: "job-priority") }
+    static var jobHoldUntil: Self { .init(rawValue: "job-hold-until") }
+    static var jobSheets: Self { .init(rawValue: "job-sheets") }
+    static var multipleDocumentHandling: Self { .init(rawValue: "multiple-document-handling") }
     static var copies: Self { .init(rawValue: "copies") }
+    static var finishings: Self { .init(rawValue: "finishings") }
+    static var pageRanges: Self { .init(rawValue: "page-ranges") }
+    static var sides: Self { .init(rawValue: "sides") }
+    static var numberUp: Self { .init(rawValue: "number-up") }
+    static var orientationRequested: Self { .init(rawValue: "orientation-requested") }
+    static var media: Self { .init(rawValue: "media") }
+    static var printerResolution: Self { .init(rawValue: "printer-resolution") }
+    static var printQuality: Self { .init(rawValue: "print-quality") }
+
+    // job description attributes
+    static var jobState: Self { .init(rawValue: "job-state") }
+    static var jobStateMessage: Self { .init(rawValue: "job-state-message") }
+    static var jobStateReasons: Self { .init(rawValue: "job-state-reasons") }
 
     static var documentFormatSupported: Self { .init(rawValue: "document-format-supported") }
 
+    // operation response attributes
     static var statusMessage: Self { .init(rawValue: "status-message") }
+    static var detailedStatusMessage: Self { .init(rawValue: "detailed-status-message") }
 }
 
 public extension IppOperationId {

@@ -41,4 +41,13 @@ final class AttributesTests: XCTestCase {
         XCTAssertEqual(attributes[.requestedAttributes]?.values, [.keyword("A"), .keyword("B")])
         XCTAssertEqual(attributes[\.operation.requestedAttributes], ["A", "B"])
     }
+
+    func testEnumSemantics() {
+        var attributes = IppAttributes()
+
+        attributes[\.jobTemplate.orientationRequested] = .portrait
+
+        XCTAssertEqual(attributes[.orientationRequested], .init(.enumValue(3)))
+        XCTAssertEqual(attributes[\.jobTemplate.orientationRequested], .portrait)
+    }
 }
