@@ -119,6 +119,14 @@ let read = try! IppRequest(buffer: &bytes)
 print(request == read) // true
 ```
 
+## What is my printer's IPP URL?
+
+Most printers are discoverable via DNS-SD/Bonjour, any DNS-SD browser should show their information. (eg: [Discovery](https://apps.apple.com/ca/app/discovery-dns-sd-browser/id1381004916?mt=12) for macOS.
+
+The `rp` value is the URL path (usually `/ipp/print`), the scheme is always `ipp://` or `ipps://`.
+
+On macOS, shared printers are also exposed via IPP. (ie: any printer can be a network printer with a server in the middle)
+
 ## Status of implementation
 
 The basic, low-level encoding and transfer is robust and should fulfill all needs.
