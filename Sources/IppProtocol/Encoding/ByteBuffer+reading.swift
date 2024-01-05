@@ -5,7 +5,7 @@ extension ByteBuffer {
         let version = try readVersion()
 
         guard let (operationIdOrStatusCode, requestId) = readMultipleIntegers(as: (Int16, Int32).self) else {
-            throw IppParsingError.fooBar
+            throw ParsingError.malformedHeader
         }
 
         let attributeGroups = try readAttributeGroups()
@@ -20,7 +20,7 @@ extension ByteBuffer {
 
     mutating func readVersion() throws -> IppVersion {
         guard let (major, minor) = readMultipleIntegers(as: (Int8, Int8).self) else {
-            throw IppParsingError.fooBar
+            throw ParsingError.malformedHeader
         }
 
         return IppVersion(major: major, minor: minor)
@@ -31,7 +31,7 @@ extension ByteBuffer {
 
         while let tag = readInteger(as: UInt8.self) {
             guard DelimiterTag.valueRange.contains(tag) else {
-                throw IppParsingError.fooBar
+                throw ParsingError.unexpectedValueTag(tag)
             }
 
             if tag == DelimiterTag.endOfAttributes.rawValue {
@@ -43,7 +43,7 @@ extension ByteBuffer {
             groups.append(.init(name: name, attributes: attributes))
         }
 
-        throw IppParsingError.fooBar
+        throw ParsingError.missingEndOfAttributes
     }
 
     mutating func readGroupAttributes() throws -> IppAttributes {
@@ -56,7 +56,7 @@ extension ByteBuffer {
             case ValueTag.begCollection.rawValue:
                 value = try readAttributeCollection()
             case ValueTag.endCollection.rawValue, ValueTag.memberAttrName.rawValue:
-                throw IppParsingError.fooBar
+                throw ParsingError.unexpectedValueTag(tag)
             default:
                 value = try IppAttribute.Value(tag: tag, valueSlice: valueSlice)
             }
@@ -74,24 +74,26 @@ extension ByteBuffer {
 
         while let (tag, name, valueSlice) = try readNextValueTriple() {
             guard name == nil else {
-                throw IppParsingError.fooBar
+                throw ParsingError.invalidCollectionSyntax(name!)
             }
 
             var value: IppAttribute.Value
 
             switch tag {
             case ValueTag.memberAttrName.rawValue:
+                let newName = String(buffer: valueSlice)
+
                 guard currentName == nil else {
-                    throw IppParsingError.fooBar
+                    throw ParsingError.invalidCollectionSyntax(newName)
                 }
 
-                currentName = String(buffer: valueSlice)
+                currentName = newName
                 continue
             case ValueTag.begCollection.rawValue:
                 value = try readAttributeCollection()
             case ValueTag.endCollection.rawValue:
                 guard currentName == nil else {
-                    throw IppParsingError.fooBar
+                    throw ParsingError.invalidCollectionSyntax(currentName!)
                 }
                 return .collection(collection)
             default:
@@ -102,12 +104,12 @@ extension ByteBuffer {
             currentName = nil
         }
 
-        throw IppParsingError.fooBar
+        throw ParsingError.missingEndOfCollection
     }
 
     mutating func readNextValueTriple() throws -> (UInt8, String?, ByteBuffer)? {
         guard let tag = getInteger(at: readerIndex, as: UInt8.self) else {
-            throw IppParsingError.fooBar
+            throw ParsingError.malformedValue
         }
 
         guard ValueTag.valueRange.contains(tag) else {
@@ -123,9 +125,9 @@ extension ByteBuffer {
     }
 
     mutating func readSizedString() throws -> String? {
-        guard let length = readInteger(as: Int16.self) else { throw IppParsingError.fooBar }
+        guard let length = readInteger(as: Int16.self) else { throw ParsingError.malformedValue }
         guard length != .zeroLength else { return nil }
-        guard let string = readString(length: Int(length)) else { throw IppParsingError.fooBar }
+        guard let string = readString(length: Int(length)) else { throw ParsingError.malformedValue }
         return string
     }
 
@@ -136,8 +138,8 @@ extension ByteBuffer {
     }
 
     mutating func readValueSlice() throws -> ByteBuffer {
-        guard let length = readInteger(as: Int16.self) else { throw IppParsingError.fooBar }
-        guard let slice = readSlice(length: Int(length)) else { throw IppParsingError.fooBar }
+        guard let length = readInteger(as: Int16.self) else { throw ParsingError.malformedValue }
+        guard let slice = readSlice(length: Int(length)) else { throw ParsingError.malformedValue }
         return slice
     }
 }
@@ -152,19 +154,15 @@ extension ByteBuffer {
 
     consuming func readToEndOrFail<T>(_ readFn: (inout Self) throws -> T?) throws -> T {
         guard let value = try readFn(&self) else {
-            throw IppParsingError.fooBar
+            throw ParsingError.malformedValue
         }
 
         guard readableBytes == 0 else {
-            throw IppParsingError.fooBar
+            throw ParsingError.malformedValue
         }
 
         return value
     }
-}
-
-enum IppParsingError: Error {
-    case fooBar
 }
 
 extension IppAttribute.Value {
@@ -287,7 +285,7 @@ private extension IppAttributes {
         } else {
             // push value as additional to last value
             guard !isEmpty else {
-                throw IppParsingError.fooBar
+                throw ParsingError.malformedValue
             }
             let lastIndex = values.endIndex - 1
             values[lastIndex].pushAdditionalValue(value)
@@ -301,6 +299,35 @@ private extension IppAttribute {
             additionalValues = [value]
         } else {
             additionalValues!.append(value)
+        }
+    }
+}
+
+internal enum ParsingError: Error, CustomStringConvertible {
+    case malformedHeader
+    case unexpectedValueTag(UInt8)
+    case unexpectedDelimiterTag(UInt8)
+    case missingEndOfAttributes
+    case missingEndOfCollection
+    case invalidCollectionSyntax(String)
+    case malformedValue
+
+    var description: String {
+        switch self {
+        case .malformedHeader:
+            "Malformed header. Could not read mandatory IPP version, operation or status code, and request ID."
+        case let .unexpectedValueTag(tag):
+            "Unexpected value tag \(tag)."
+        case let .unexpectedDelimiterTag(tag):
+            "Unexpected delimiter tag \(tag)."
+        case .missingEndOfAttributes:
+            "Missing end of attributes delimiter."
+        case .missingEndOfCollection:
+            "Missing end of collection delimiter."
+        case let .invalidCollectionSyntax(name):
+            "Invalid collection syntax. Unexpected name \(name)."
+        case .malformedValue:
+            "Malformed value."
         }
     }
 }

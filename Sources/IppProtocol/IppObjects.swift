@@ -1,4 +1,4 @@
-import struct Foundation.URLComponents
+import struct Foundation.URLComponents // NOTE: the only use of Foundation... worth it?
 
 /// Defines an IPP object that can be used to create and execute IPP requests.
 ///
@@ -9,6 +9,7 @@ public protocol IppObjectProtocol {
     func execute(request: IppRequest, data: DataFormat?) async throws -> IppResponse
 }
 
+/// Defines a simplified API for the most common operations of IPP printers.
 public protocol IppPrinterObject: IppObjectProtocol {}
 // could be extended to support other IPP objects like jobs, etc. with their own API
 
@@ -34,8 +35,9 @@ public extension IppPrinterObject {
         jobName: String? = nil,
         documentName: String? = nil,
         documentFormat: String? = nil,
-        jobAttributes: IppAttributes = [:],
-        data: DataFormat) async throws -> IppResponse {
+        jobAttributes: IppAttributes? = nil,
+        data: DataFormat
+    ) async throws -> IppResponse {
         var request = makeNewRequest(operation: .printJob)
 
         request[.operation].with {
@@ -44,7 +46,9 @@ public extension IppPrinterObject {
             $0[\.operation.documentFormat] = documentFormat
         }
 
-        request[.job] = jobAttributes
+        if let jobAttributes = jobAttributes {
+            request[.job] = jobAttributes
+        }
 
         print(request)
 
@@ -69,7 +73,7 @@ public extension IppRequest {
               firstGroup.name == .operation,
               firstGroup.attributes.count >= 3
         else {
-            throw IppParsingError.fooBar
+            throw InvalidRequestError.invalidOperationAttributes
         }
 
         guard firstGroup.attributes.keys[0] == .attributesCharset,
@@ -77,11 +81,11 @@ public extension IppRequest {
               firstGroup.attributes.keys[2] == .printerUri || firstGroup.attributes.keys[2] == .jobUri,
               case let .uri(uri) = firstGroup.attributes.values[2].value
         else {
-            throw IppParsingError.fooBar
+            throw InvalidRequestError.invalidOperationAttributes
         }
 
         guard var targetURL = URLComponents(string: uri) else {
-            throw IppParsingError.fooBar
+            throw InvalidRequestError.invalidTargetUri(uri)
         }
 
         switch targetURL.scheme {
@@ -90,10 +94,27 @@ public extension IppRequest {
         case "ipps":
             targetURL.scheme = "https"
         default:
-            throw IppParsingError.fooBar
+            throw InvalidRequestError.invalidScheme(targetURL.scheme ?? "<none>")
         }
 
         targetURL.port = targetURL.port ?? 631
         return targetURL.string!
+    }
+}
+
+enum InvalidRequestError: Error, CustomStringConvertible {
+    case invalidTargetUri(String)
+    case invalidScheme(String)
+    case invalidOperationAttributes
+
+    var description: String {
+        switch self {
+        case let .invalidTargetUri(uri):
+            return "Invalid target URI: \(uri)"
+        case let .invalidScheme(scheme):
+            return "Invalid scheme: \(scheme)"
+        case .invalidOperationAttributes:
+            return "Operation attributes must contain attributesCharset, attributesNaturalLanguage, and a targetUri as the first three attributes."
+        }
     }
 }

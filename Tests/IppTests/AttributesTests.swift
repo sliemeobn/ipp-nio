@@ -32,4 +32,13 @@ final class AttributesTests: XCTestCase {
         XCTAssertEqual(attributes[\.operation.requestingUserName], "C")
         XCTAssertEqual(attributes[\.operation.jobUri], "D")
     }
+
+    func testSetOfKeywordsSemantics() {
+        var attributes = IppAttributes()
+
+        attributes[\.operation.requestedAttributes] = ["A", "B"]
+
+        XCTAssertEqual(attributes[.requestedAttributes]?.values, [.keyword("A"), .keyword("B")])
+        XCTAssertEqual(attributes[\.operation.requestedAttributes], ["A", "B"])
+    }
 }
