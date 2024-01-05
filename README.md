@@ -9,11 +9,13 @@ This library allows you to communicate with virtually any network printer direct
 ## Add `ipp-nio` to your package
 ```swift
 // Add to package dependencies
-.package(url: "https://github.com/sliemeobn/ipp-nio.git", from: "0.0.1"),
+.package(url: "https://github.com/sliemeobn/ipp-nio.git", from: "0.1.0-alpha"),
 ```
 ```swift
 // Add to your target depencies
-.product(name: "IppClient", package: "ipp-nio"),
+dependencies: [
+    .product(name: "IppClient", package: "ipp-nio"),
+]
 ```
 
 ## Features
