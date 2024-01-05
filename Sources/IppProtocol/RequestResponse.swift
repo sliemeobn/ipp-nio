@@ -8,7 +8,7 @@ public struct IppRequest: Equatable, Sendable {
     public var requestId: Int32
     public var attributeGroups: IppAttributeGroups
 
-    public init(version: IppVersion, operationId: IppOperationId, requestId: Int32, attributeGroups: IppAttributeGroups) {
+    public init(version: IppVersion, operationId: IppOperationId, requestId: Int32, attributeGroups: IppAttributeGroups = []) {
         self.version = version
         self.operationId = operationId
         self.requestId = requestId
@@ -23,7 +23,7 @@ public struct IppResponse: Equatable, Sendable {
     public var requestId: Int32
     public var attributeGroups: IppAttributeGroups
 
-    public init(version: IppVersion, statusCode: IppStatusCode, requestId: Int32, attributeGroups: IppAttributeGroups) {
+    public init(version: IppVersion, statusCode: IppStatusCode, requestId: Int32, attributeGroups: IppAttributeGroups = []) {
         self.version = version
         self.statusCode = statusCode
         self.requestId = requestId

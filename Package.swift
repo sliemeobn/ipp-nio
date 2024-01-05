@@ -40,7 +40,8 @@ let package = Package(
             dependencies: [
                 .target(name: "IppClient"),
             ],
-            path: "Examples/PrintPDF"
+            path: "Examples/PrintPDF",
+            exclude: ["hi_mom.pdf"]
         ),
         .testTarget(
             name: "IppTests",
