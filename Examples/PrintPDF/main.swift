@@ -28,12 +28,12 @@ while true {
     }
 
     switch jobState {
-        case .aborted, .canceled, .completed:
-            print("Job ended with state \(jobState)")
-            exit(0)
-        default:
-            print("Job state is \(jobState)")
+    case .aborted, .canceled, .completed:
+        print("Job ended with state \(jobState)")
+        exit(0)
+    default:
+        print("Job state is \(jobState)")
     }
 
-    try await Task.sleep(for: .seconds(3))
+    try await Task.sleep(nanoseconds: 3_000_000_000)
 }
