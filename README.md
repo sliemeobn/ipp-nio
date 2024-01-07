@@ -121,7 +121,7 @@ print(request == read) // true
 
 ## What is my printer's IPP URL?
 
-Most printers are discoverable via DNS-SD/Bonjour, any DNS-SD browser should show their information. (eg: [Discovery](https://apps.apple.com/ca/app/discovery-dns-sd-browser/id1381004916?mt=12) for macOS.
+Most printers are discoverable via DNS-SD/Bonjour, any DNS-SD browser should show their information. (eg: [Discovery](https://apps.apple.com/ca/app/discovery-dns-sd-browser/id1381004916?mt=12) for macOS).
 
 The `rp` value is the URL path (usually `/ipp/print`), the scheme is always `ipp://` or `ipps://`.
 
@@ -130,7 +130,7 @@ On macOS, shared printers are also exposed via IPP. (ie: any printer can be a ne
 ## Status of implementation
 
 The basic, low-level encoding and transfer is robust and should fulfill all needs.
-The *semantic model* for attributes only covers the most basic for now, but can be extended quite easily as needed.
+The *semantic model* only covers the most basic attributes for now, but can be extended quite easily as needed.
 
 Since the library is written with custom extensions in mind, it should be quite simple to extend to any use case even without direct support.
 
