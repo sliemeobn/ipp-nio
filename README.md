@@ -1,5 +1,8 @@
 # ipp-nio: Internet Printing Protocol for Swift
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsliemeobn%2Fipp-nio%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/sliemeobn/ipp-nio)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsliemeobn%2Fipp-nio%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/sliemeobn/ipp-nio)
+
 An implementation of the [Internet Printing Protocol (IPP)](https://www.rfc-editor.org/rfc/rfc8011) in pure swift, based on [swift-nio](https://github.com/apple/swift-nio) and [async-http-client](https://github.com/swift-server/async-http-client).
 
 This library allows you to communicate with virtually any network printer directly without any drivers or OS dependencies. It provides an easy API for encoding and exchanging IPP 1.1 requests and responses and a flexible, swifty way to work with attributes in a stongly-typed manner.
