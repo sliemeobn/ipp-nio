@@ -11,6 +11,7 @@ public extension IppAttribute.Name {
     static var documentName: Self { .init(rawValue: "document-name") }
     static var documentFormat: Self { .init(rawValue: "document-format") }
     static var requestedAttributes: Self { .init(rawValue: "requested-attributes") }
+    static var message: Self { .init(rawValue: "message") }
     static var ippAttributeFidelity: Self { .init(rawValue: "ipp-attribute-fidelity") }
     static var compression: Self { .init(rawValue: "compression") }
 

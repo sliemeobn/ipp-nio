@@ -6,7 +6,7 @@ import struct Foundation.URLComponents // NOTE: the only use of Foundation... wo
 public protocol IppObjectProtocol {
     associatedtype DataFormat
     /// Creates a new IPP request with the given operation ID that is targeted at this object.
-    /// 
+    ///
     /// The request will be initialized with the IPP version, operation ID, the the required attributes for its target.
     func makeNewRequest(operation: IppOperationId) -> IppRequest
 
@@ -39,6 +39,7 @@ public extension IppPrinterObject {
     /// Executes a Print-Job request.
     func printJob(
         jobName: String? = nil,
+        attributeFidelity: Bool? = nil,
         documentName: String? = nil,
         documentFormat: String? = nil,
         jobAttributes: IppAttributes? = nil,
@@ -48,6 +49,7 @@ public extension IppPrinterObject {
 
         request[.operation].with {
             $0[\.operation.jobName] = jobName
+            $0[\.operation.ippAttributeFidelity] = attributeFidelity
             $0[\.operation.documentName] = documentName
             $0[\.operation.documentFormat] = documentFormat
         }
@@ -68,6 +70,15 @@ public extension IppJobObject {
         var request = makeNewRequest(operation: .getJobAttributes)
 
         request[operation: \.requestedAttributes] = requestedAttributes
+
+        return try await execute(request: request, data: nil)
+    }
+
+    /// Execute a Cancel-Job request.
+    func cancelJob(message: String? = nil) async throws -> IppResponse {
+        var request = makeNewRequest(operation: .cancelJob)
+
+        request[operation: \.message] = message
 
         return try await execute(request: request, data: nil)
     }

@@ -42,6 +42,7 @@ public enum SemanticModel {
             public var documentName: Attribute<String> { .init(name: .documentName, syntax: Syntaxes.name) }
             public var requestedAttributes: Attribute<[IppAttribute.Name]> { .init(name: .requestedAttributes, syntax: Syntaxes.setOf(Syntaxes.keyword())) }
             public var documentFormat: Attribute<String> { .init(name: .documentFormat, syntax: Syntaxes.mimeMediaType) }
+            public var message: Attribute<String> { .init(name: .message, syntax: Syntaxes.text) }
             public var ippAttributeFidelity: Attribute<Bool> { .init(name: .ippAttributeFidelity, syntax: Syntaxes.boolean) }
         }
 
