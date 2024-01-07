@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.8
 import PackageDescription
 
 let package = Package(
@@ -35,17 +35,22 @@ let package = Package(
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ]
         ),
-        .executableTarget(
-            name: "PrintPDF",
-            dependencies: [
-                .target(name: "IppClient"),
-            ],
-            path: "Examples/PrintPDF",
-            exclude: ["hi_mom.pdf"]
-        ),
         .testTarget(
             name: "IppTests",
             dependencies: ["IppProtocol", "IppClient"]
         ),
     ]
 )
+
+#if os(macOS) || os(Linux) 
+package.targets.append(
+    .executableTarget(
+        name: "PrintPDF",
+        dependencies: [
+            .target(name: "IppClient"),
+        ],
+        path: "Examples/PrintPDF",
+        exclude: ["hi_mom.pdf"]
+    )
+)
+#endif
