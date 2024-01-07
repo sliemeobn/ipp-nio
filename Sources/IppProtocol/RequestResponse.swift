@@ -157,9 +157,7 @@ public extension IppAttribute {
             self.init(rawValue: value)
         }
 
-        public var description: String {
-            rawValue
-        }
+        public var description: String { rawValue }
     }
 }
 

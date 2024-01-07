@@ -72,4 +72,13 @@ public extension IppResponse {
             self[.job][(\SemanticModel.Attributes.jobDescription).appending(path: attribute)] = newValue
         }
     }
+
+    subscript<V>(printer attribute: KeyPath<SemanticModel.Attributes.PrinterDescription, SemanticModel.Attribute<V>>) -> V? {
+        get {
+            self[.printer][(\SemanticModel.Attributes.printerDescription).appending(path: attribute)]
+        }
+        set {
+            self[.printer][(\SemanticModel.Attributes.printerDescription).appending(path: attribute)] = newValue
+        }
+    }
 }

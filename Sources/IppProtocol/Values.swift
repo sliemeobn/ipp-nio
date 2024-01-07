@@ -34,8 +34,23 @@ public extension IppAttribute.Name {
     static var jobStateMessage: Self { .init(rawValue: "job-state-message") }
     static var jobStateReasons: Self { .init(rawValue: "job-state-reasons") }
 
+    // printer description attributes
     static var documentFormatSupported: Self { .init(rawValue: "document-format-supported") }
-
+    static var printerName: Self { .init(rawValue: "printer-name") }
+    static var printerState: Self { .init(rawValue: "printer-state") }
+    static var printerStateMessage: Self { .init(rawValue: "printer-state-message") }
+    static var printerStateReasons: Self { .init(rawValue: "printer-state-reasons") }
+    static var printerIsAcceptingJobs: Self { .init(rawValue: "printer-is-accepting-jobs") }
+    static var queuedJobCount: Self { .init(rawValue: "queued-job-count") }
+    static var printerInfo: Self { .init(rawValue: "printer-info") }
+    static var printerUriSupported: Self { .init(rawValue: "printer-uri-supported") }
+    static var uriSecuritySupported: Self { .init(rawValue: "uri-security-supported") }
+    static var uriAuthenticationSupported: Self { .init(rawValue: "uri-authentication-supported") }
+    static var printerLocation: Self { .init(rawValue: "printer-location") }
+    static var printerMoreInfo: Self { .init(rawValue: "printer-more-info") }
+    static var printerMessageFromOperator: Self { .init(rawValue: "printer-message-from-operator") }
+    static var colorSupported: Self { .init(rawValue: "color-supported") }
+    
     // operation response attributes
     static var statusMessage: Self { .init(rawValue: "status-message") }
     static var detailedStatusMessage: Self { .init(rawValue: "detailed-status-message") }

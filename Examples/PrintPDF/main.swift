@@ -6,6 +6,17 @@ let printer = IppPrinter(
     uri: "ipps://macmini.local/printers/EPSON_XP_7100_Series"
 )
 
+let attributesResponse = try await printer.getPrinterAttributes()
+
+if let printerName = attributesResponse[printer: \.printerName],
+   let printerState = attributesResponse[printer: \.printerState],
+   let printerStateReasons = attributesResponse[printer: \.printerStateReasons]
+{
+    print("Printing on \(printerName) in state \(printerState), state reasons \(printerStateReasons)")
+} else {
+    print("Could not read printer attributes, status code \(attributesResponse.statusCode)")
+}
+
 let pdf = try Data(contentsOf: URL(fileURLWithPath: "Examples/PrintPDF/hi_mom.pdf"))
 
 let response = try await printer.printJob(

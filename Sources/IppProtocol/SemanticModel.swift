@@ -28,6 +28,7 @@ public enum SemanticModel {
         public let operationResponse = OperationResponse()
         public let jobTemplate = JobTemplate()
         public let jobDescription = JobDescription()
+        public let printerDescription = PrinterDescription()
 
         public struct Operation {
             public var attributesCharset: Attribute<String> { .init(name: .attributesCharset, syntax: Syntaxes.charset) }
@@ -39,7 +40,7 @@ public enum SemanticModel {
             public var requestingUserName: Attribute<String> { .init(name: .requestingUserName, syntax: Syntaxes.name) }
             public var jobName: Attribute<String> { .init(name: .jobName, syntax: Syntaxes.name) }
             public var documentName: Attribute<String> { .init(name: .documentName, syntax: Syntaxes.name) }
-            public var requestedAttributes: Attribute<[IppAttribute.Name]> { .init(name: .requestedAttributes, syntax: Syntaxes.setOfKeywords()) }
+            public var requestedAttributes: Attribute<[IppAttribute.Name]> { .init(name: .requestedAttributes, syntax: Syntaxes.setOf(Syntaxes.keyword())) }
             public var documentFormat: Attribute<String> { .init(name: .documentFormat, syntax: Syntaxes.mimeMediaType) }
             public var ippAttributeFidelity: Attribute<Bool> { .init(name: .ippAttributeFidelity, syntax: Syntaxes.boolean) }
         }
@@ -62,6 +63,18 @@ public enum SemanticModel {
             public var jobUri: Attribute<String> { .init(name: .jobUri, syntax: Syntaxes.uri) }
             public var jobId: Attribute<Int32> { .init(name: .jobId, syntax: Syntaxes.integer) }
             public var jobState: Attribute<JobState> { .init(name: .jobState, syntax: Syntaxes.enum()) }
+        }
+
+        public struct PrinterDescription {
+            public var printerName: Attribute<String> { .init(name: .printerName, syntax: Syntaxes.name) }
+            public var printerLocation: Attribute<String> { .init(name: .printerLocation, syntax: Syntaxes.text) }
+            public var printerInfo: Attribute<String> { .init(name: .printerInfo, syntax: Syntaxes.text) }
+            public var printerState: Attribute<PrinterState> { .init(name: .printerState, syntax: Syntaxes.enum()) }
+            public var printerStateReasons: Attribute<[PrinterStateReason]> { .init(name: .printerStateReasons, syntax: Syntaxes.setOf(Syntaxes.keyword())) }
+            public var printerIsAcceptingJobs: Attribute<Bool> { .init(name: .printerIsAcceptingJobs, syntax: Syntaxes.boolean) }
+            public var queuedJobCount: Attribute<Int32> { .init(name: .queuedJobCount, syntax: Syntaxes.integer) }
+            public var printerMessageFromOperator: Attribute<String> { .init(name: .printerMessageFromOperator, syntax: Syntaxes.text) }
+            public var colorSupported: Attribute<Bool> { .init(name: .colorSupported, syntax: Syntaxes.boolean) }
         }
     }
 
@@ -88,9 +101,9 @@ public enum SemanticModel {
                   set: { .init(.enumValue($0.rawValue)) })
         }
 
-        public static func setOfKeywords<T: RawRepresentable<String>>(as: T.Type = T.self) -> Syntax<[T]> {
-            .init(get: { $0.values.compactMap { $0.asString }.compactMap(T.init(rawValue:)) },
-                  set: { v in .init(v.map(\.rawValue).map { .keyword($0) }) })
+        public static func setOf<T>(_ syntax: Syntax<T>) -> Syntax<[T]> {
+            .init(get: { $0.values.map { IppAttribute($0) }.compactMap(syntax.get) },
+                  set: { v in .init(v.compactMap(syntax.set).reduce(into: []) { $0.append($1.value) }) })
         }
     }
 
@@ -112,13 +125,15 @@ public extension SemanticModel {
         case high = 5
     }
 
-    struct Sides: RawRepresentable {
+    struct Sides: RawRepresentable, CustomStringConvertible {
         public let rawValue: String
         public init(rawValue: String) { self.rawValue = rawValue }
 
         public static var oneSided: Self { Self(rawValue: "one-sided") }
         public static var twoSidedLongEdge: Self { Self(rawValue: "two-sided-long-edge") }
         public static var twoSidedShortEdge: Self { Self(rawValue: "two-sided-short-edge") }
+
+        public var description: String { rawValue }
     }
 
     enum JobState: Int32 {
@@ -129,6 +144,45 @@ public extension SemanticModel {
         case canceled = 7
         case aborted = 8
         case completed = 9
+    }
+
+    enum PrinterState: Int32 {
+        case idle = 3
+        case processing = 4
+        case stopped = 5
+    }
+
+    struct PrinterStateReason: RawRepresentable, CustomStringConvertible {
+        public let rawValue: String
+        public init(rawValue: String) { self.rawValue = rawValue }
+
+        public static var other: Self { Self(rawValue: "other") }
+        public static var mediaNeeded: Self { Self(rawValue: "media-needed") }
+        public static var mediaJam: Self { Self(rawValue: "media-jam") }
+        public static var movingToPaused: Self { Self(rawValue: "moving-to-paused") }
+        public static var paused: Self { Self(rawValue: "paused") }
+        public static var shutdown: Self { Self(rawValue: "shutdown") }
+        public static var connectingToDevice: Self { Self(rawValue: "connecting-to-device") }
+        public static var timedOut: Self { Self(rawValue: "timed-out") }
+        public static var stopping: Self { Self(rawValue: "stopping") }
+        public static var stoppedPartly: Self { Self(rawValue: "stopped-partly") }
+        public static var tonerLow: Self { Self(rawValue: "toner-low") }
+        public static var tonerEmpty: Self { Self(rawValue: "toner-empty") }
+        public static var spoolAreaFull: Self { Self(rawValue: "spool-area-full") }
+        public static var coverOpen: Self { Self(rawValue: "cover-open") }
+        public static var interlockOpen: Self { Self(rawValue: "interlock-open") }
+        public static var doorOpen: Self { Self(rawValue: "door-open") }
+        public static var inputTrayMissing: Self { Self(rawValue: "input-tray-missing") }
+        public static var mediaLow: Self { Self(rawValue: "media-low") }
+        public static var mediaEmpty: Self { Self(rawValue: "media-empty") }
+        public static var outputTrayMissing: Self { Self(rawValue: "output-tray-missing") }
+        public static var outputAreaAlmostFull: Self { Self(rawValue: "output-area-almost-full") }
+        public static var outputAreaFull: Self { Self(rawValue: "output-area-full") }
+        public static var markerSupplyLow: Self { Self(rawValue: "marker-supply-low") }
+        public static var markerSupplyEmpty: Self { Self(rawValue: "marker-supply-empty") }
+        public static var markerWasteAlmostFull: Self { Self(rawValue: "marker-waste-almost-full") }
+
+        public var description: String { rawValue }
     }
 }
 
