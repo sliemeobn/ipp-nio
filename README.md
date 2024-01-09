@@ -99,6 +99,24 @@ while true {
 }
 ```
 
+### Setting authentication
+```swift
+// "basic" mode
+let printer = IppPrinter(
+    httpClient: HTTPClient(configuration: .init(certificateVerification: .none)),
+    uri: "ipps://my-printer/ipp/print",
+    authentication: .basic(username: "user", password: "top-secret")
+)
+
+// "requesting-user" mode
+let printer = IppPrinter(
+    httpClient: HTTPClient(configuration: .init(certificateVerification: .none)),
+    uri: "ipps://my-printer/ipp/print",
+    authentication: .requestingUser(username: "user")
+)
+
+```
+
 ### Working with raw payloads
 ```swift
 import IppProtocol
@@ -138,7 +156,6 @@ The *semantic model* only covers the most basic attributes for now, but can be e
 Since the library is written with custom extensions in mind, it should be quite simple to extend to any use case even without direct support.
 
 Missing:
- - authentication (at least `basic` and `requesting-user` should be quite simple to add, TBD soon)
  - consistent documentation
  - top-level APIs for all operations
  - support for CUPS operations

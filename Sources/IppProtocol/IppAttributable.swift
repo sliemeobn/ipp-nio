@@ -8,7 +8,7 @@ extension IppResponse: IppAttributable {}
 
 public extension IppAttributable {
     /// Accesses the first attribute group with the specified name. If the group does not exist, it is created.
-
+    ///
     /// This mostly behaves like a dictionary, but the IPP specification allows for multiple groups with the same name.
     subscript(_ name: IppAttributeGroup.Name) -> IppAttributes {
         _read {

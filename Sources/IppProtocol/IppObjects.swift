@@ -85,14 +85,44 @@ public extension IppJobObject {
 }
 
 public extension IppRequest {
-    /// Creates a new IPP request with the given printer URI, operation ID, and attributes natural language.
-    init(printerUri: String, operation: IppOperationId, attributesNaturalLanguage: String = "en", version: IppVersion = .v1_1) {
-        self.init(version: .v1_1, operationId: operation, requestId: 1, attributeGroups: [])
+    /// Creates a new IPP request targetet at a printer object.
+    init(
+        printerUri: String,
+        operation: IppOperationId,
+        requestingUserName: String? = nil,
+        attributesNaturalLanguage: String = "en",
+        version: IppVersion = .v1_1
+    ) {
+        // NOTE: maybe use a running number for requestId? not really worth the complexity though (nobody cares about it)
+        self.init(version: .v1_1, operationId: operation, requestId: 1)
 
+        // the order of these is important
         self[.operation].with {
             $0[\.operation.attributesCharset] = "utf-8"
             $0[\.operation.attributesNaturalLanguage] = attributesNaturalLanguage
             $0[\.operation.printerUri] = printerUri
+            $0[\.operation.requestingUserName] = requestingUserName
+        }
+    }
+
+    /// Creates a new IPP request targeted at a job object.
+    init(
+        printerUri: String,
+        jobId: Int32,
+        operation: IppOperationId,
+        requestingUserName: String? = nil,
+        attributesNaturalLanguage: String = "en",
+        version: IppVersion = .v1_1
+    ) {
+        self.init(version: .v1_1, operationId: operation, requestId: 1)
+
+        // the order of these is important
+        self[.operation].with {
+            $0[\.operation.attributesCharset] = "utf-8"
+            $0[\.operation.attributesNaturalLanguage] = attributesNaturalLanguage
+            $0[\.operation.printerUri] = printerUri
+            $0[\.operation.jobId] = jobId
+            $0[\.operation.requestingUserName] = requestingUserName
         }
     }
 

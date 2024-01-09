@@ -21,9 +21,14 @@ extension IppPrinter.Job: IppJobObject {
     public typealias DataFormat = IppPrinter.DataFormat
 
     public func makeNewRequest(operation: IppOperationId) -> IppRequest {
-        var request = printer.makeNewRequest(operation: operation)
-        request[operation: \.jobId] = jobId
-        return request
+        IppRequest(
+            printerUri: printer.uri,
+            jobId: jobId,
+            operation: operation,
+            requestingUserName: printer.authentication?.requestingUserName,
+            attributesNaturalLanguage: printer.language,
+            version: printer.version
+        )
     }
 
     public func execute(request: IppRequest, data: DataFormat?) async throws -> IppResponse {

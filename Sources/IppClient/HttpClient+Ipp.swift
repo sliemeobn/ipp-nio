@@ -9,8 +9,13 @@ public extension HTTPClient {
     /// - Parameter data: The data to send with the request.
     ///
     /// - Returns: The IPP response.
-    func execute(_ request: IppRequest, data: consuming HTTPClientRequest.Body? = nil, timeout: TimeAmount = .seconds(10)) async throws -> IppResponse {
-        let httpRequest = try HTTPClientRequest(ippRequest: request, data: data)
+    func execute(
+        _ request: IppRequest,
+        authentication: IppAuthentication? = nil,
+        data: consuming HTTPClientRequest.Body? = nil,
+        timeout: TimeAmount = .seconds(10)
+    ) async throws -> IppResponse {
+        let httpRequest = try HTTPClientRequest(ippRequest: request, authentication: authentication, data: data)
         let httpResponse = try await execute(httpRequest, timeout: timeout)
 
         if httpResponse.status != .ok {
@@ -24,11 +29,20 @@ public extension HTTPClient {
 
 public extension HTTPClientRequest {
     /// Creates a HTTP by encoding the IPP request and attaching the data if provided.
-    init(ippRequest: IppRequest, data: consuming Body? = nil) throws {
-        self.init(url: try ippRequest.validatedHttpTargetUrl)
+    init(ippRequest: IppRequest, authentication: IppAuthentication? = nil, data: consuming Body? = nil) throws {
+        try self.init(url: ippRequest.validatedHttpTargetUrl)
         method = .POST
         headers.add(name: "content-type", value: "application/ipp")
-        // TODO: auth
+
+        // set auth header if needed
+        if let authenticationMode = authentication?.mode {
+            switch authenticationMode {
+            case .requestingUser(username: _): break // nothing to do
+            case let .basic(username: username, password: password):
+                let value = HTTPClient.Authorization.basic(username: username, password: password).headerValue
+                headers.add(name: "authorization", value: value)
+            }
+        }
 
         // maybe pre-size this thing somehow?
         var buffer = ByteBuffer()
