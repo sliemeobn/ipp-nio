@@ -14,7 +14,7 @@ public extension HTTPClient {
         authentication: IppAuthentication? = nil,
         data: consuming HTTPClientRequest.Body? = nil,
         timeout: TimeAmount = .seconds(10),
-        maxBytes: Int = 1024 * 1024
+        maxResponseBytes: Int = 1024 * 1024
     ) async throws -> IppResponse {
         let httpRequest = try HTTPClientRequest(ippRequest: request, authentication: authentication, data: data)
         let httpResponse = try await execute(httpRequest, timeout: timeout)
@@ -23,7 +23,7 @@ public extension HTTPClient {
             throw IppHttpResponseError(response: httpResponse)
         }
 
-        var buffer = try await httpResponse.body.collect(upTo: maxBytes)
+        var buffer = try await httpResponse.body.collect(upTo: maxResponseBytes)
         return try IppResponse(buffer: &buffer)
     }
 }
