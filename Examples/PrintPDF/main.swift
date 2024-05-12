@@ -1,8 +1,10 @@
 import Foundation
 import IppClient
 
+let httpClient = HTTPClient(configuration: .init(certificateVerification: .none))
+
 let printer = IppPrinter(
-    httpClient: HTTPClient(configuration: .init(certificateVerification: .none)),
+    httpClient: httpClient,
     uri: "ipps://macmini.local/printers/EPSON_XP_7100_Series"
 )
 
@@ -48,3 +50,5 @@ while true {
 
     try await Task.sleep(nanoseconds: 3_000_000_000)
 }
+
+try httpClient.syncShutdown()
