@@ -3,6 +3,11 @@ import IppClient
 
 let httpClient = HTTPClient(configuration: .init(certificateVerification: .none))
 
+defer {
+    // the HTTPClient needs to be shutdown after use to avoid memory leaks
+    try httpClient.syncShutdown()
+}
+
 let printer = IppPrinter(
     httpClient: httpClient,
     uri: "ipps://macmini.local/printers/EPSON_XP_7100_Series"
@@ -28,7 +33,6 @@ let response = try await printer.printJob(
 
 guard response.statusCode == .successfulOk, let jobId = response[job: \.jobId] else {
     print("Print job failed with status \(response.statusCode)")
-    try httpClient.syncShutdown()
     exit(1)
 }
 
@@ -38,14 +42,12 @@ while true {
     let response = try await job.getJobAttributes(requestedAttributes: [.jobState])
     guard let jobState = response[job: \.jobState] else {
         print("Failed to get job state")
-        try httpClient.syncShutdown()
         exit(1)
     }
 
     switch jobState {
     case .aborted, .canceled, .completed:
         print("Job ended with state \(jobState)")
-        try httpClient.syncShutdown()
         exit(0)
     default:
         print("Job state is \(jobState)")
